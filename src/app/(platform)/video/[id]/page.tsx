@@ -7,19 +7,21 @@ import CommentSection from '@/components/video/CommentSection'
 import VideoCard from '@/components/video/VideoCard'
 import Image from 'next/image'
 
-export default async function VideoPage({ params }: { params: { id: string } }) {
+export default async function VideoPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createServerSupabaseClient()
+
+  const { id } = await params
 
   const { data: video } = await supabase
     .from('videos')
     .select('*, uploader:profiles(*)')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (!video) notFound()
 
   // Increment view count
-  await supabase.rpc('increment_views', { video_id: params.id })
+  await supabase.rpc('increment_views', { video_id: id })
 
   // Related videos
   const { data: related } = await supabase
@@ -27,7 +29,7 @@ export default async function VideoPage({ params }: { params: { id: string } }) 
     .select('*, uploader:profiles(id,username,display_name,avatar_url,verified)')
     .eq('genre', video.genre)
     .eq('status', 'live')
-    .neq('id', params.id)
+    ..eq('id', id)
     .limit(4)
 
   const playerUrl = video.cf_uid ? getPlayerUrl(video.cf_uid) : null
