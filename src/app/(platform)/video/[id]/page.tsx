@@ -34,78 +34,22 @@ export default async function VideoPage({
   const playerUrl = video.cf_uid ? getPlayerUrl(video.cf_uid) : null
 
   return (
-    <div className="px-8 py-7 pb-16 max-w-screen-2xl mx-auto">
+    <div className="px-8 py-7 pb-16">
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-7 items-start">
         <div>
           <div className="relative rounded-xl overflow-hidden bg-surface2 aspect-video border border-border">
             {playerUrl ? (
               <iframe src={playerUrl} className="absolute inset-0 w-full h-full" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowFullScreen />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple/20 to-bg">
+              <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
                   <div className="font-display text-2xl text-muted mb-2">WORDT VERWERKT</div>
-                  <div className="text-sm text-muted/60">FORGE is je film aan het transcoderen...</div>
-                </div>
-              </div>
-            )}
-            <div className="absolute top-3 left-3 flex gap-2">
-              <span clas
-
-cd ~/Downloads/aimeega
-cat > src/app/\(platform\)/video/\[id\]/page.tsx << 'EOF'
-import { notFound } from 'next/navigation'
-import { createServerSupabaseClient } from '@/lib/supabase'
-import { getPlayerUrl } from '@/lib/cloudflare'
-import { formatCount, formatDuration, timeAgo } from '@/lib/utils'
-import VideoActions from '@/components/video/VideoActions'
-import CommentSection from '@/components/video/CommentSection'
-import VideoCard from '@/components/video/VideoCard'
-import Image from 'next/image'
-
-export default async function VideoPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
-  const { id } = await params
-  const supabase = await createServerSupabaseClient()
-
-  const { data: video } = await supabase
-    .from('videos')
-    .select('*, uploader:profiles(*)')
-    .eq('id', id)
-    .single()
-
-  if (!video) notFound()
-
-  const { data: related } = await supabase
-    .from('videos')
-    .select('*, uploader:profiles(id,username,display_name,avatar_url,verified)')
-    .eq('genre', video.genre)
-    .eq('status', 'live')
-    .neq('id', id)
-    .limit(4)
-
-  const playerUrl = video.cf_uid ? getPlayerUrl(video.cf_uid) : null
-
-  return (
-    <div className="px-8 py-7 pb-16 max-w-screen-2xl mx-auto">
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-7 items-start">
-        <div>
-          <div className="relative rounded-xl overflow-hidden bg-surface2 aspect-video border border-border">
-            {playerUrl ? (
-              <iframe src={playerUrl} className="absolute inset-0 w-full h-full" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowFullScreen />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple/20 to-bg">
-                <div className="text-center">
-                  <div className="font-display text-2xl text-muted mb-2">WORDT VERWERKT</div>
-                  <div className="text-sm text-muted/60">FORGE is je film aan het transcoderen...</div>
+                  <div className="text-sm text-muted/60">FORGE transcodeert je film...</div>
                 </div>
               </div>
             )}
             <div className="absolute top-3 left-3 flex gap-2">
               <span className="badge-ai">AI GEGENEREERD</span>
-              <span className="bg-black/70 text-muted text-[9px] font-semibold px-2 py-0.5 rounded">via {video.ai_tool}</span>
             </div>
           </div>
 
@@ -114,7 +58,6 @@ export default async function VideoPage({
             <div className="flex items-center gap-4 flex-wrap mb-5">
               <span className="text-muted text-sm">{formatCount(video.view_count)} weergaven</span>
               <span className="bg-surface2 border border-border text-muted text-xs px-3 py-1 rounded-full">{video.genre}</span>
-              {video.cf_duration && <span className="text-muted text-sm">{formatDuration(video.cf_duration)}</span>}
               <span className="text-muted text-xs">{timeAgo(video.created_at)}</span>
             </div>
             <VideoActions video={video} />
@@ -137,16 +80,10 @@ export default async function VideoPage({
             <button className="btn-primary text-sm py-2 px-5">+ Volgen</button>
           </div>
 
-          {video.description && (
-            <div className="mt-5 bg-surface border border-border rounded-xl p-4">
-              <p className="text-sm text-muted leading-relaxed">{video.description}</p>
-            </div>
-          )}
-
-          <div className="mt-4 bg-brand/4 border border-brand/15 rounded-xl p-4">
-            <div className="text-[9px] font-bold text-brand tracking-widest mb-3">EU AI ACT — VERPLICHTE DISCLOSURE</div>
+          <div className="mt-4 border border-brand/15 rounded-xl p-4">
+            <div className="text-[9px] font-bold text-brand tracking-widest mb-3">EU AI ACT — DISCLOSURE</div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[['AI Tool', video.ai_tool], ['Genre', video.genre], ['Muziek', video.music_source || 'Niet opgegeven'], ['Stemmen', video.voice_source || 'Niet opgegeven']].map(([k, v]) => (
+              {([['AI Tool', video.ai_tool], ['Genre', video.genre], ['Muziek', video.music_source || 'n.v.t.'], ['Stemmen', video.voice_source || 'n.v.t.']] as [string,string][]).map(([k, v]) => (
                 <div key={k}>
                   <div className="text-[9px] text-muted tracking-wider mb-1">{k}</div>
                   <div className="text-sm font-semibold">{v}</div>
@@ -159,12 +96,11 @@ export default async function VideoPage({
             <div className="mt-8">
               <h2 className="font-display text-2xl tracking-wide mb-5">MEER {video.genre.toUpperCase()}</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {related.map((v: any) => <VideoCard key={v.id} video={v} />)}
+                {(related as any[]).map((v) => <VideoCard key={v.id} video={v} />)}
               </div>
             </div>
           )}
         </div>
-
         <CommentSection videoId={video.id} commentCount={video.comment_count} />
       </div>
     </div>
