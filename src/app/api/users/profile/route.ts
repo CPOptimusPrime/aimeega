@@ -1,18 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
-import { createClerkClient } from '@clerk/clerk-sdk-node'
-
-const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 
 export async function GET(req: NextRequest) {
   try {
-    const sessionToken = req.cookies.get('__session')?.value
-    if (!sessionToken) return NextResponse.json({ profile: null, videos: [] })
+    // Get active session context cookie
+    const activeContext = req.cookies.get('clerk_active_context')?.value
+    if (!activeContext) return NextResponse.json({ profile: null, videos: [], debug: 'no active context' })
 
-    const payload = await clerkClient.verifyToken(sessionToken)
-    const userId = payload.sub
+    // Extract session ID from clerk_active_context (format: sess_xxx:)
+    const sessionId = activeContext.split(':')[0]
+    if (!sessionId) return NextResponse.json({ profile: null, videos: [], debug: 'no session id' })
 
-    if (!userId) return NextResponse.json({ profile: null, videos: [] })
+    // Use Clerk REST API to get session
+    const clerkRes = await fetch(`https://api.clerk.com/v1/sessions/${sessionId}`, {
+      headers: { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` }
+    })
+    
+    if (!clerkRes.ok) return NextResponse.json({ profile: null, videos: [], debug: 'clerk api failed', status: clerkRes.status })
+    
+    const session = await clerkRes.json()
+    const userId = session.user_id
+    
+    if (!userId) return NextResponse.json({ profile: null, videos: [], debug: 'no user_id in session' })
 
     const supabase = createAdminClient()
     const { data: profile } = await supabase
@@ -21,7 +30,7 @@ export async function GET(req: NextRequest) {
       .eq('clerk_id', userId)
       .single()
 
-    if (!profile) return NextResponse.json({ profile: null, videos: [] })
+    if (!profile) return NextResponse.json({ profile: null, videos: [], debug: `no profile for ${userId}` })
 
     const { data: videos } = await supabase
       .from('videos')
