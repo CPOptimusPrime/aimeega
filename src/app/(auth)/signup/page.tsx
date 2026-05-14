@@ -82,8 +82,8 @@ export default function SignupPage() {
 
   const usernameIcon = () => {
     if (usernameStatus === 'checking') return <Loader2 size={16} className="animate-spin text-muted" />
-    if (usernameStatus === 'available') return <Check size={16} className="text-green-500" />
-    if (usernameStatus === 'taken' || usernameStatus === 'invalid') return <X size={16} className="text-red-500" />
+    if (usernameStatus === 'available') return <Check size={16} style={{color:"#00d48a"}} />
+    if (usernameStatus === 'taken' || usernameStatus === 'invalid') return <X size={16} style={{color:"#ff3d6b"}} />
     return null
   }
 
@@ -142,9 +142,9 @@ export default function SignupPage() {
                   maxLength={30} />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">{usernameIcon()}</div>
               </div>
-              {usernameStatus === 'available' && <p className="text-green-500 text-xs mt-1">Beschikbaar!</p>}
-              {usernameStatus === 'taken' && <p className="text-red-500 text-xs mt-1">Al in gebruik</p>}
-              {usernameStatus === 'invalid' && <p className="text-red-500 text-xs mt-1">Alleen letters, cijfers, _ en -</p>}
+              {usernameStatus === 'available' && <p style={{color:"#00d48a"}} className="text-xs mt-1">Beschikbaar!</p>}
+              {usernameStatus === 'taken' && <p style={{color:"#ff3d6b"}} className="text-xs mt-1">Al in gebruik</p>}
+              {usernameStatus === 'invalid' && <p style={{color:"#ff3d6b"}} className="text-xs mt-1">Alleen letters, cijfers, _ en -</p>}
               {suggestions.length > 0 && (
                 <div className="flex gap-2 flex-wrap mt-2">
                   {suggestions.map(s => (
