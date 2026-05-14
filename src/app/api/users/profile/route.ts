@@ -3,25 +3,21 @@ import { createAdminClient } from '@/lib/supabase'
 
 export async function GET(req: NextRequest) {
   try {
-    // Get active session context cookie
-    const activeContext = req.cookies.get('clerk_active_context')?.value
-    if (!activeContext) return NextResponse.json({ profile: null, videos: [], debug: 'no active context' })
+    // Decode JWT session token to get user ID
+    const sessionToken = req.cookies.get('__session')?.value
+    if (!sessionToken) return NextResponse.json({ profile: null, videos: [], debug: 'no session token' })
 
-    // Extract session ID from clerk_active_context (format: sess_xxx:)
-    const sessionId = activeContext.split(':')[0]
-    if (!sessionId) return NextResponse.json({ profile: null, videos: [], debug: 'no session id' })
+    // JWT has 3 parts: header.payload.signature
+    const parts = sessionToken.split('.')
+    if (parts.length < 2) return NextResponse.json({ profile: null, videos: [], debug: 'invalid jwt' })
 
-    // Use Clerk REST API to get session
-    const clerkRes = await fetch(`https://api.clerk.com/v1/sessions/${sessionId}`, {
-      headers: { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` }
-    })
+    // Decode base64url payload
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64 + '='.repeat((4 - base64.length % 4) % 4)
+    const payload = JSON.parse(Buffer.from(padded, 'base64').toString('utf8'))
     
-    if (!clerkRes.ok) return NextResponse.json({ profile: null, videos: [], debug: 'clerk api failed', status: clerkRes.status })
-    
-    const session = await clerkRes.json()
-    const userId = session.user_id
-    
-    if (!userId) return NextResponse.json({ profile: null, videos: [], debug: 'no user_id in session' })
+    const userId = payload.sub
+    if (!userId) return NextResponse.json({ profile: null, videos: [], debug: 'no sub in jwt', payload })
 
     const supabase = createAdminClient()
     const { data: profile } = await supabase
@@ -30,7 +26,7 @@ export async function GET(req: NextRequest) {
       .eq('clerk_id', userId)
       .single()
 
-    if (!profile) return NextResponse.json({ profile: null, videos: [], debug: `no profile for ${userId}` })
+    if (!profile) return NextResponse.json({ profile: null, videos: [], debug: 'no profile for ' + userId })
 
     const { data: videos } = await supabase
       .from('videos')
