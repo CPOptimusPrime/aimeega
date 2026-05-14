@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
-import Clerk from '@clerk/clerk-sdk-node'
+import { createClerkClient } from '@clerk/clerk-sdk-node'
 
-const clerk = Clerk({ secretKey: process.env.CLERK_SECRET_KEY })
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 
 export async function GET(req: NextRequest) {
   try {
     const sessionToken = req.cookies.get('__session')?.value
     if (!sessionToken) return NextResponse.json({ profile: null, videos: [] })
 
-    const session = await clerk.verifyToken(sessionToken)
-    const userId = session.sub
+    const payload = await clerkClient.verifyToken(sessionToken)
+    const userId = payload.sub
 
     if (!userId) return NextResponse.json({ profile: null, videos: [] })
 
