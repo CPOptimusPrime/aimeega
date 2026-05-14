@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { useClerk } from '@clerk/nextjs'
 import AimeegaLogo from '@/components/ui/AimeegaLogo'
 import { Home, TrendingUp, Upload, User } from 'lucide-react'
 
@@ -10,6 +13,18 @@ const NAV = [
 ]
 
 const SYSTEMS = ['NEXUS', 'FORGE', 'ORACLE', 'SENTINEL', 'VAULT']
+
+function LogoutButton() {
+  const { signOut } = useClerk()
+  return (
+    <button
+      onClick={() => signOut({ redirectUrl: '/login' })}
+      style={{fontSize:12,color:'#7b2fff',background:'none',border:'none',cursor:'pointer',padding:0}}
+    >
+      Uitloggen
+    </button>
+  )
+}
 
 export default function PlatformLayout({ children }: { children: React.ReactNode }) {
 
@@ -47,7 +62,7 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
 
         {/* User */}
         <div className="border-t border-border pt-3 mt-2 flex items-center gap-2.5 px-2">
-          <a href="/" style={{fontSize:12,color:'#7b2fff'}}>Uitloggen</a>
+          <LogoutButton />
           <div>
             <div className="text-xs font-semibold truncate max-w-[100px]">
               Creator
