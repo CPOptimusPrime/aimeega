@@ -11,18 +11,19 @@ export default async function ProfilePage() {
     const res = await fetch(`${url}/rest/v1/profiles?select=username&clerk_id=eq.${clerkUser?.id}&limit=1`, {
       headers: {
         apikey: key!,
-        Authorization: `Bearer ${key!}`
-      }
+        Authorization: `Bearer ${key!}`,
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
     })
-    fetchTest = `status: ${res.status}`
+    const data = await res.text()
+    fetchTest = `status: ${res.status} — data: ${data.slice(0, 100)}`
   } catch (e: any) {
-    fetchTest = `fout: ${e.message}`
+    fetchTest = `fout: ${e.message} — cause: ${JSON.stringify(e.cause)}`
   }
 
   return (
     <div className="p-8 text-white text-xs">
-      <div>URL aanwezig: {url ? 'ja' : 'NEE'}</div>
-      <div>Key aanwezig: {key ? 'ja' : 'NEE'}</div>
       <div>Fetch test: {fetchTest}</div>
     </div>
   )
