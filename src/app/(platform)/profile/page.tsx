@@ -1,23 +1,29 @@
 import { currentUser } from '@clerk/nextjs/server'
-import { createAdminClient } from '@/lib/supabase'
 
 export default async function ProfilePage() {
   const clerkUser = await currentUser()
   
-  if (!clerkUser) return <div className="p-8 text-red-500">Niet ingelogd</div>
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   
-  const supabase = createAdminClient()
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('clerk_id', clerkUser.id)
-    .single()
+  let fetchTest = 'niet getest'
+  try {
+    const res = await fetch(`${url}/rest/v1/profiles?select=username&clerk_id=eq.${clerkUser?.id}&limit=1`, {
+      headers: {
+        apikey: key!,
+        Authorization: `Bearer ${key!}`
+      }
+    })
+    fetchTest = `status: ${res.status}`
+  } catch (e: any) {
+    fetchTest = `fout: ${e.message}`
+  }
 
   return (
-    <div className="p-8 text-white">
-      <div>Clerk ID: {clerkUser.id}</div>
-      <div>Profile: {profile ? profile.username : 'niet gevonden'}</div>
-      <div>Error: {error ? error.message : 'geen'}</div>
+    <div className="p-8 text-white text-xs">
+      <div>URL aanwezig: {url ? 'ja' : 'NEE'}</div>
+      <div>Key aanwezig: {key ? 'ja' : 'NEE'}</div>
+      <div>Fetch test: {fetchTest}</div>
     </div>
   )
 }
