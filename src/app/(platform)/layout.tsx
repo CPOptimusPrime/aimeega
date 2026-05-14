@@ -1,8 +1,6 @@
-import { UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
 import AimeegaLogo from '@/components/ui/AimeegaLogo'
 import { Home, TrendingUp, Upload, User } from 'lucide-react'
-import { currentUser } from '@clerk/nextjs/server'
 
 const NAV = [
   { href: '/discover', icon: Home, label: 'Ontdekken' },
@@ -13,8 +11,7 @@ const NAV = [
 
 const SYSTEMS = ['NEXUS', 'FORGE', 'ORACLE', 'SENTINEL', 'VAULT']
 
-export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
-  const user = await currentUser()
+export default function PlatformLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-bg text-white font-body">
@@ -50,10 +47,10 @@ export default async function PlatformLayout({ children }: { children: React.Rea
 
         {/* User */}
         <div className="border-t border-border pt-3 mt-2 flex items-center gap-2.5 px-2">
-          <UserButton afterSignOutUrl="/" />
+          <a href="/" style={{fontSize:12,color:'#7b2fff'}}>Uitloggen</a>
           <div>
             <div className="text-xs font-semibold truncate max-w-[100px]">
-              {user?.firstName ?? user?.emailAddresses[0]?.emailAddress?.split('@')[0] ?? 'Creator'}
+              Creator
             </div>
             <div className="text-[10px] text-brand">Creator</div>
           </div>
