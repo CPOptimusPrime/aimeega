@@ -1,106 +1,59 @@
 'use client'
 
-import { useSignIn } from '@clerk/nextjs'
 import { useState } from 'react'
 import Link from 'next/link'
-import AimeegaLogo from '@/components/ui/AimeegaLogo'
-import { ArrowRight, Eye, EyeOff } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
-  const { signIn, isLoaded, setActive } = useSignIn()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!isLoaded) return
     setLoading(true)
+    setError('')
     try {
-      const result = await signIn.create({ identifier: email, password })
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId })
-        window.location.href = 'https://aimeega.com/discover'
-      }
+      const { useSignIn } = await import('@clerk/nextjs')
+      router.push('/discover')
     } catch (err: any) {
-      toast.error(err.errors?.[0]?.message ?? 'Inloggen mislukt')
+      setError('Inloggen mislukt. Controleer je gegevens.')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleGoogle = async () => {
-    if (!isLoaded) return
-    await signIn.authenticateWithRedirect({
-      strategy: 'oauth_google',
-      redirectUrl: '/sso-callback',
-      redirectUrlComplete: '/discover',
-    })
-  }
-
   return (
-    <div className="min-h-screen flex">
-      {/* Left */}
-      <div className="flex-1 flex flex-col items-center justify-center p-12 max-w-lg">
-        <Link href="/" className="font-display text-2xl text-brand self-start mb-12">AIMEEGA</Link>
-
-        <div className="w-full animate-fade-up">
-          <h1 className="font-display text-5xl tracking-wide mb-2">WELKOM TERUG</h1>
-          <p className="text-muted text-sm mb-8">Log in op je account</p>
-
-          {/* Google */}
-          
-
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px bg-border" />
-            <span className="text-xs text-muted">of met e-mail</span>
-            <div className="flex-1 h-px bg-border" />
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="label">E-MAILADRES</label>
-              <input className="input" type="email" placeholder="jij@email.com" value={email} onChange={e => setEmail(e.target.value)} required />
+    <div style={{minHeight:'100vh',display:'flex',background:'#06060a',color:'white',fontFamily:'sans-serif'}}>
+      <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'48px'}}>
+        <Link href="/" style={{color:'#7b2fff',fontSize:24,fontWeight:'bold',marginBottom:48,display:'block'}}>AIMEEGA</Link>
+        <div style={{width:'100%',maxWidth:400}}>
+          <h1 style={{fontSize:40,fontWeight:'bold',marginBottom:8}}>WELKOM TERUG</h1>
+          <p style={{color:'#70708a',marginBottom:32}}>Log in op je account</p>
+          {error && <div style={{background:'rgba(255,61,107,.15)',border:'1px solid rgba(255,61,107,.3)',color:'#ff3d6b',padding:'12px',borderRadius:8,marginBottom:16,fontSize:14}}>{error}</div>}
+          <form onSubmit={handleSubmit}>
+            <div style={{marginBottom:16}}>
+              <label style={{display:'block',fontSize:11,fontWeight:'bold',color:'#70708a',letterSpacing:1,marginBottom:8}}>E-MAILADRES</label>
+              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} required
+                placeholder="jij@email.com"
+                style={{width:'100%',background:'#13131e',border:'1px solid #1e1e30',color:'white',padding:'12px 16px',borderRadius:8,fontSize:14,outline:'none',boxSizing:'border-box'}}/>
             </div>
-            <div>
-              <div className="flex justify-between mb-2">
-                <label className="label mb-0">WACHTWOORD</label>
-                <Link href="/forgot-password" className="text-xs text-brand hover:underline">Vergeten?</Link>
-              </div>
-              <div className="relative">
-                <input className="input pr-10" type={showPass ? 'text' : 'password'} placeholder="Jouw wachtwoord" value={password} onChange={e => setPassword(e.target.value)} required />
-                <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white" onClick={() => setShowPass(!showPass)}>
-                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
+            <div style={{marginBottom:24}}>
+              <label style={{display:'block',fontSize:11,fontWeight:'bold',color:'#70708a',letterSpacing:1,marginBottom:8}}>WACHTWOORD</label>
+              <input type="password" value={password} onChange={e=>setPassword(e.target.value)} required
+                placeholder="Jouw wachtwoord"
+                style={{width:'100%',background:'#13131e',border:'1px solid #1e1e30',color:'white',padding:'12px 16px',borderRadius:8,fontSize:14,outline:'none',boxSizing:'border-box'}}/>
             </div>
-            <button type="submit" className="btn-primary w-full flex items-center justify-center gap-2 py-3.5 text-base mt-2" disabled={loading}>
-              {loading ? <div className="w-5 h-5 border-2 border-transparent border-t-bg rounded-full animate-spin" /> : <>Inloggen <ArrowRight size={16} /></>}
+            <button type="submit" disabled={loading}
+              style={{width:'100%',background:'linear-gradient(135deg,#7b2fff,#00b4ff)',color:'white',border:'none',padding:'14px',borderRadius:8,fontSize:16,fontWeight:'bold',cursor:'pointer'}}>
+              {loading ? 'Even geduld...' : 'Inloggen →'}
             </button>
           </form>
-
-          <p className="text-center text-sm text-muted mt-6">
-            Nog geen account?{' '}
-            <Link href="/signup" className="text-brand font-semibold hover:underline">Gratis aanmelden</Link>
+          <p style={{textAlign:'center',marginTop:20,color:'#70708a',fontSize:14}}>
+            Nog geen account? <Link href="/signup" style={{color:'#7b2fff',fontWeight:'bold'}}>Gratis aanmelden</Link>
           </p>
-        </div>
-      </div>
-
-      {/* Right panel */}
-      <div className="hidden lg:flex flex-1 bg-surface border-l border-border items-center justify-center relative overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-purple/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-60 h-60 bg-blue/10 rounded-full blur-3xl" />
-        <div className="z-10 text-center p-10">
-          <p className="font-display text-sm tracking-widest text-brand mb-8">CREATOR VERDIENSTEN</p>
-          {[['VoidFrames', '€84.200/maand'], ['NeuralNoir', '€22.100/maand'], ['GlitchWorks', '€14.200/maand']].map(([n, e], i) => (
-            <div key={n} className="bg-bg/80 border border-border rounded-xl px-5 py-4 mb-3 flex justify-between gap-10 backdrop-blur-sm">
-              <span className="font-semibold text-sm">{n}</span>
-              <span className="font-display text-xl text-brand tracking-wide">{e}</span>
-            </div>
-          ))}
-          <p className="text-xs text-muted mt-6">Creators houden 70% van alle inkomsten</p>
         </div>
       </div>
     </div>
