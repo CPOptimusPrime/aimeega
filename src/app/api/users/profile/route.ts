@@ -1,32 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
 export async function GET(req: NextRequest) {
   try {
-    // Decode JWT session token to get user ID
     const sessionToken = req.cookies.get('__session')?.value
-    if (!sessionToken) return NextResponse.json({ profile: null, videos: [], debug: 'no session token' })
+    if (!sessionToken) return NextResponse.json({ profile: null, videos: [], debug: 'no session' })
 
-    // JWT has 3 parts: header.payload.signature
     const parts = sessionToken.split('.')
-    if (parts.length < 2) return NextResponse.json({ profile: null, videos: [], debug: 'invalid jwt' })
-
-    // Decode base64url payload
     const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
     const padded = base64 + '='.repeat((4 - base64.length % 4) % 4)
     const payload = JSON.parse(Buffer.from(padded, 'base64').toString('utf8'))
-    
     const userId = payload.sub
-    if (!userId) return NextResponse.json({ profile: null, videos: [], debug: 'no sub in jwt', payload })
 
-    const supabase = createAdminClient()
-    const { data: profile } = await supabase
+    if (!userId) return NextResponse.json({ profile: null, videos: [], debug: 'no userId' })
+
+    // Use service role key to bypass RLS
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+
+    const { data: profile, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('clerk_id', userId)
       .single()
 
-    if (!profile) return NextResponse.json({ profile: null, videos: [], debug: 'no profile for ' + userId })
+    if (error) return NextResponse.json({ profile: null, videos: [], debug: error.message })
+    if (!profile) return NextResponse.json({ profile: null, videos: [], debug: 'profile null' })
 
     const { data: videos } = await supabase
       .from('videos')
