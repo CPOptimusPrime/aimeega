@@ -40,7 +40,7 @@ export default function SignupPage() {
       const result = await signUp.attemptEmailAddressVerification({ code })
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId })
-        window.location.href = '/onboarding'
+        window.location.href = 'https://aimeega.com/onboarding'
       }
     } catch (err: any) {
       toast.error(err.errors?.[0]?.message ?? 'Code onjuist')

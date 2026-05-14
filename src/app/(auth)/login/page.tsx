@@ -22,7 +22,7 @@ export default function LoginPage() {
       const result = await signIn.create({ identifier: email, password })
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId })
-        window.location.href = '/discover'
+        window.location.href = 'https://aimeega.com/discover'
       }
     } catch (err: any) {
       toast.error(err.errors?.[0]?.message ?? 'Inloggen mislukt')
