@@ -14,9 +14,9 @@ const SYSTEMS = ['NEXUS', 'FORGE', 'ORACLE', 'SENTINEL', 'VAULT']
 export default function PlatformLayout({ children }: { children: React.ReactNode }) {
 
   return (
-    <div className="flex h-screen overflow-hidden bg-bg text-white font-body">
+    <div style={{display:"flex",height:"100vh",overflow:"hidden",background:"#06060a",color:"white"}}>
       {/* Sidebar */}
-      <aside className="w-48 flex-shrink-0 bg-surface border-r border-border flex flex-col py-4 px-2.5">
+      <aside style={{width:192,flexShrink:0,background:"#0d0d14",borderRight:"1px solid #1e1e30",display:"flex",flexDirection:"column",padding:"16px 10px"}}>
         {/* Logo */}
         <div className="px-2 pb-4 mb-3 border-b border-border">
           <Link href="/" className="font-display text-xl tracking-wide text-white hover:text-brand transition-colors">AIMEEGA</Link>
@@ -58,7 +58,7 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
       </aside>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}}>
         {/* Topbar */}
         <header className="flex-shrink-0 h-14 flex items-center justify-between px-7 bg-bg/90 backdrop-blur-xl border-b border-border">
           <div className="flex items-center gap-3">
@@ -75,7 +75,7 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-auto">
+        <main style={{flex:1,overflowY:"auto"}}>
           {children}
         </main>
       </div>
