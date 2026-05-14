@@ -20,7 +20,10 @@ export default function LoginPage() {
       const result = await signIn.create({ identifier: email, password })
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId })
-        window.location.href = '/discover'
+        console.log('Login success, redirecting...')
+        setTimeout(() => { window.location.href = '/discover' }, 500)
+      } else {
+        setError('Status: ' + result.status)
       }
     } catch (err: any) {
       setError(err.errors?.[0]?.longMessage ?? err.errors?.[0]?.message ?? 'Inloggen mislukt')
