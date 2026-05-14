@@ -1,33 +1,9 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-import { NextResponse } from 'next/server'
+import { authMiddleware } from "@clerk/nextjs"
 
-const isProtectedRoute = createRouteMatcher([
-  '/discover(.*)',
-  '/trending(.*)',
-  '/upload(.*)',
-  '/profile(.*)',
-  '/onboarding(.*)',
-  '/api/videos(.*)',
-  '/api/upload(.*)',
-])
-
-const isAuthRoute = createRouteMatcher(['/login(.*)', '/signup(.*)'])
-
-export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth()
-  
-  if (isAuthRoute(req) && userId) {
-    return NextResponse.redirect(new URL('/discover', req.url))
-  }
-  
-  if (isProtectedRoute(req) && !userId) {
-    return NextResponse.redirect(new URL('/login', req.url))
-  }
+export default authMiddleware({
+  publicRoutes: ["/", "/login", "/signup", "/api/webhooks(.*)"],
 })
 
 export const config = {
-  matcher: [
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    '/(api|trpc)(.*)',
-  ],
+  matcher: ["/((?!.+\.[\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 }
