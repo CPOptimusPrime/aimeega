@@ -18,12 +18,16 @@ export default function LoginPage() {
     setError('')
     try {
       const result = await signIn.create({ identifier: email, password })
-      if (result.status === 'complete') {
+      const status = result.status
+      const factors = JSON.stringify(result.supportedSecondFactors ?? [])
+      if (status === 'complete') {
         await setActive({ session: result.createdSessionId })
-        console.log('Login success, redirecting...')
-        setTimeout(() => { window.location.href = '/discover' }, 500)
+        window.location.href = '/discover'
+      } else if (status === 'needs_second_factor') {
+        // Probeer eerste factor te voltooien
+        setError(`2FA vereist maar uitgeschakeld. Factors: ${factors}`)
       } else {
-        setError('Status: ' + result.status)
+        setError(`Status: ${status}`)
       }
     } catch (err: any) {
       setError(err.errors?.[0]?.longMessage ?? err.errors?.[0]?.message ?? 'Inloggen mislukt')
