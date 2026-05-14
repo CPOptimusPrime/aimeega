@@ -89,10 +89,7 @@ export default function SignupPage() {
           <h1 className="font-display text-5xl tracking-wide mb-2">JOIN HET PLATFORM</h1>
           <p className="text-muted text-sm mb-8">Gratis aanmelden. Geen creditcard.</p>
 
-          <button onClick={handleGoogle} className="btn-ghost w-full flex items-center justify-center gap-3 mb-6 py-3">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27 3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10 5.35 0 9.25-3.67 9.25-9.09 0-1.15-.15-1.81-.15-1.81z"/></svg>
-            Doorgaan met Google
-          </button>
+          
           <div className="flex items-center gap-3 mb-6">
             <div className="flex-1 h-px bg-border" /><span className="text-xs text-muted">of met e-mail</span><div className="flex-1 h-px bg-border" />
           </div>
