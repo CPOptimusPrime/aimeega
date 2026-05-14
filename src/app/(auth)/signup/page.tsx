@@ -41,6 +41,8 @@ export default function SignupPage() {
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId })
         window.location.href = '/onboarding'
+      } else {
+        toast.error('Status: ' + result.status)
       }
     } catch (err: any) {
       toast.error(err.errors?.[0]?.message ?? 'Code onjuist')
