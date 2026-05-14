@@ -27,7 +27,8 @@
     "sharp": "^0.33.5",
     "svix": "^1.93.0",
     "tailwind-merge": "^2.5.3",
-    "zustand": "^5.0.0"
+    "zustand": "^5.0.0",
+    "@clerk/clerk-sdk-node": "^4.13.0"
   },
   "devDependencies": {
     "@types/node": "^20.16.11",
