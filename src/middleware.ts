@@ -2,7 +2,7 @@ import { authMiddleware } from "@clerk/nextjs"
 import { NextResponse } from "next/server"
 
 export default authMiddleware({
-  publicRoutes: ["/", "/login", "/signup", "/api/webhooks(.*)"],
+  publicRoutes: ["/", "/login", "/signup", "/api/webhooks(.*)", "/api/users/check-username"],
   afterAuth(auth, req) {
     const url = req.nextUrl
 
