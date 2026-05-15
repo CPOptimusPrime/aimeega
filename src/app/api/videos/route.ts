@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabase
     .from('videos')
-    .select(`*, uploader:profiles(id,username,display_name,avatar_url,verified)`, { count: 'exact' })
+    .select(`*, uploader:profiles!videos_uploader_id_fkey(id,username,display_name,avatar_url,verified)`, { count: 'exact' })
     .eq('status', 'live')
     .range(offset, offset + per_page - 1)
 
