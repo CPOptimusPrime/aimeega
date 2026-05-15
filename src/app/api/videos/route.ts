@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   const per_page = parseInt(searchParams.get('per_page') ?? '20')
   const offset = (page - 1) * per_page
 
-  const supabase = await createServerSupabaseClient()
+  const supabase = createAdminClient()
 
   let query = supabase
     .from('videos')
