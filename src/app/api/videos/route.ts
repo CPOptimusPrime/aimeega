@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       has_real_people: body.has_real_people,
       has_brand_ip: body.has_brand_ip,
       cf_uid: body.cf_uid,
-      status: 'pending', // goes to SENTINEL review
+      status: 'live',
     })
     .select()
     .single()
