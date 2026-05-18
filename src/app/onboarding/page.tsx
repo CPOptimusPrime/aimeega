@@ -16,32 +16,21 @@ const STEPS_TOTAL = 4
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const { isLoaded, isSignedIn } = useAuth()
-  
-  useEffect(() => {
-    if (!isLoaded) return
-    fetch('/api/users/profile')
-      .then(r => r.json())
-      .then(data => {
-        if (data.profile?.username) {
-          router.replace('/discover')
-        }
-      })
-  }, [isLoaded])
+  const { isLoaded } = useAuth()
   const [step, setStep] = useState(0)
-
-  // Redirect als user al een username heeft (signup flow al voltooid)
-  useEffect(() => {
-    fetch('/api/users/profile')
-      .then(r => r.json())
-      .then(data => { if (data?.profile?.username) router.replace('/discover') })
-      .catch(() => {})
-  }, [])
   const [role, setRole] = useState('')
   const [username, setUsername] = useState('')
   const [usernameStatus, setUsernameStatus] = useState<'idle'|'checking'|'available'|'taken'|'invalid'>('idle')
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [genres, setGenres] = useState<string[]>([])
+
+  useEffect(() => {
+    if (!isLoaded) return
+    fetch('/api/users/profile')
+      .then(r => r.json())
+      .then(data => { if (data?.profile?.username) router.replace('/discover') })
+      .catch(() => {})
+  }, [isLoaded, router])
   const [tools, setTools] = useState<string[]>([])
 
   const toggle = (arr: string[], set: (v: string[]) => void, val: string) =>

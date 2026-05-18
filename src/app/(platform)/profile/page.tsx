@@ -18,6 +18,7 @@ export default async function ProfilePage() {
     .from('videos')
     .select('*, uploader:profiles(id,username,display_name,avatar_url,verified)')
     .eq('uploader_id', profile?.id)
+    .eq('status', 'live')
     .order('created_at', { ascending: false })
 
   if (!profile) return <div className="p-8 text-muted">Profiel niet gevonden.</div>
