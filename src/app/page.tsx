@@ -226,8 +226,14 @@ export default function LandingPage() {
           <div className="text-xs text-dim">© 2026 · AI Films by Creators. For Everyone.</div>
         </div>
         <div className="flex gap-6 flex-wrap">
-          {['Voorwaarden', 'Privacy', 'EU AI Act', 'Creator richtlijnen', 'Contact'].map(l => (
-            <span key={l} className="text-xs text-muted hover:text-white cursor-pointer transition-colors">{l}</span>
+          {[
+              ['Voorwaarden', '/terms'],
+              ['Privacy', '/privacy'],
+              ['EU AI Act', '/privacy'],
+              ['Creator richtlijnen', '/terms'],
+              ['Contact', 'mailto:info@aimeega.com'],
+            ].map(([l, href]) => (
+            <a key={l} href={href} className="text-xs text-muted hover:text-white transition-colors" style={{textDecoration:'none'}}>{l}</a>
           ))}
         </div>
         <div className="flex items-center gap-2 text-xs text-dim">
