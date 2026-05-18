@@ -60,7 +60,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
           <LogoutButton />
           <div>
             <div className="text-xs font-semibold truncate max-w-[100px]">
-              {profile?.display_name ?? profile?.username ?? clerkUser?.id ?? 'geen id'}
+              {profile?.display_name ?? profile?.username ?? 'Creator'}
             </div>
             <div className="text-[10px] text-brand">@{profile?.username ?? '...'}</div>
           </div>
