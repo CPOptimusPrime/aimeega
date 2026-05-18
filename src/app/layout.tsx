@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import CookieBanner from '@/components/ui/CookieBanner'
 import { Bebas_Neue, Instrument_Sans } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import { Toaster } from 'react-hot-toast'
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="nl" className={`${bebasNeue.variable} ${instrumentSans.variable}`}>
         <body className="bg-bg text-white font-body antialiased">
           {children}
+        <CookieBanner />
           <Toaster
             position="bottom-right"
             toastOptions={{
