@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@clerk/nextjs'
 import { ArrowRight, Check, X, Loader2 } from 'lucide-react'
 import { GENRES, AI_TOOLS } from '@/lib/utils'
 
@@ -15,7 +16,27 @@ const STEPS_TOTAL = 4
 
 export default function OnboardingPage() {
   const router = useRouter()
+  const { isLoaded, isSignedIn } = useAuth()
+  
+  useEffect(() => {
+    if (!isLoaded) return
+    fetch('/api/users/profile')
+      .then(r => r.json())
+      .then(data => {
+        if (data.profile?.username) {
+          router.replace('/discover')
+        }
+      })
+  }, [isLoaded])
   const [step, setStep] = useState(0)
+
+  // Redirect als user al een username heeft (signup flow al voltooid)
+  useEffect(() => {
+    fetch('/api/users/profile')
+      .then(r => r.json())
+      .then(data => { if (data?.profile?.username) router.replace('/discover') })
+      .catch(() => {})
+  }, [])
   const [role, setRole] = useState('')
   const [username, setUsername] = useState('')
   const [usernameStatus, setUsernameStatus] = useState<'idle'|'checking'|'available'|'taken'|'invalid'>('idle')
