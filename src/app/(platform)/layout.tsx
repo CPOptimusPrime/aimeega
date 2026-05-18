@@ -2,6 +2,8 @@ import Link from 'next/link'
 import LogoutButton from '@/components/ui/LogoutButton'
 import AimeegaLogo from '@/components/ui/AimeegaLogo'
 import { Home, TrendingUp, Upload, User } from 'lucide-react'
+import { currentUser } from '@clerk/nextjs/server'
+import { createAdminClient } from '@/lib/supabase'
 
 const NAV = [
   { href: '/discover', icon: Home, label: 'Ontdekken' },
@@ -12,7 +14,14 @@ const NAV = [
 
 const SYSTEMS = ['NEXUS', 'FORGE', 'ORACLE', 'SENTINEL', 'VAULT']
 
-export default function PlatformLayout({ children }: { children: React.ReactNode }) {
+export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
+  const clerkUser = await currentUser()
+  const supabase = createAdminClient()
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('username, display_name')
+    .eq('clerk_id', clerkUser?.id ?? '')
+    .single()
 
   return (
     <div style={{display:"flex",height:"100vh",overflow:"hidden",background:"#06060a",color:"white"}}>
@@ -51,9 +60,9 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
           <LogoutButton />
           <div>
             <div className="text-xs font-semibold truncate max-w-[100px]">
-              Creator
+              {profile?.display_name ?? profile?.username ?? clerkUser?.id ?? 'geen id'}
             </div>
-            <div className="text-[10px] text-brand">Creator</div>
+            <div className="text-[10px] text-brand">@{profile?.username ?? '...'}</div>
           </div>
         </div>
       </aside>
